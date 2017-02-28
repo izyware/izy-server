@@ -16,11 +16,43 @@ Then use:
 In your node server, you can intercept any url and redirect it to the izy-server by:
 
 ```
+
 return require('izy-server')({
 
 /* config object for customizing the izy access */
 
 }).handleRequest(request, response);    
+```
+
+For example, the following will create a very simple end point on localhost:3000
+
+
+```
+
+const http = require('http')  
+const port = 3000
+
+const requestHandler = (request, response) => {  
+  console.log('requestHandler', request.url);
+  return require('izy-server')({}).handleRequest(request, response);
+}
+
+const server = http.createServer(requestHandler);
+
+server.listen(port, (err) => {  
+  if (err) {
+    return console.log('something bad happened', err)
+  }
+  console.log(`server is listening on ${port}`)
+});
+
+
+```
+
+Hitting http://localhost:3000/ will display the following message:
+
+```
+izyserver running. Please define processReq function to customize the behavior.
 ```
 
 ## NOTE
