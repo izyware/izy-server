@@ -24,32 +24,40 @@ return require('izy-server')({
 }).handleRequest(request, response);    
 ```
 
-For example, the following will create a very simple end point on localhost:3000
+For example, the following will create a very simple end point on https://localhost:3000/. It is worth mentionin that the *ui/node/direct* will convert http urls to https when called from https context, so it is important that your local server support https. Here is an example https server:
 
+Generate the private key and certificate by: 
+
+```
+openssl genrsa 1024 > key.pem
+openssl req -x509 -new -key key.pem > key-cert.pem
+```
+
+Then run the server: 
 
 ```
 
-const http = require('http')  
-const port = 3000
+const port = 3000;
+const https = require('https');
+const fs = require('fs');
 
-const requestHandler = (request, response) => {  
-  console.log('requestHandler', request.url);
-  return require('izy-server')({}).handleRequest(request, response);
+ var options = {
+ key: fs.readFileSync('key.pem'),
+ cert: fs.readFileSync('key-cert.pem')
+ };
+
+const requestHandler = (request, response) => {
+   console.log('requestHandler', request.url);
+   return require('izy-server')({}).handleRequest(request, response);
 }
 
-const server = http.createServer(requestHandler);
-
-server.listen(port, (err) => {  
-  if (err) {
-    return console.log('something bad happened', err)
-  }
-  console.log(`server is listening on ${port}`)
-});
+https.createServer(options, requestHandler).listen(port);
+console.log('Listening on port: ', port);
 
 
 ```
 
-Hitting http://localhost:3000/ will display the following message:
+Hitting https://localhost:3000/ will display the following message:
 
 ```
 izyserver running. Please define processReq function to customize the behavior.
